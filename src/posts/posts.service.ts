@@ -16,20 +16,14 @@ export class PostsService {
   }
 
   async getFilteredPosts(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.PostWhereUniqueInput;
-    where?: Prisma.PostWhereInput;
     orderBy?: Prisma.PostOrderByWithRelationInput;
+    where?: Prisma.PostWhereInput;
   }): Promise<Post[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { orderBy, where } = params;
 
     return this.prisma.post.findMany({
-      skip,
-      take,
-      cursor,
-      where,
       orderBy,
+      where,
     });
   }
 
@@ -40,8 +34,8 @@ export class PostsService {
   }
 
   async updatePost(params: {
-    where: Prisma.PostWhereUniqueInput;
     data: Prisma.PostUpdateInput;
+    where: Prisma.PostWhereUniqueInput;
   }): Promise<Post> {
     const { data, where } = params;
 

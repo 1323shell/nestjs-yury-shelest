@@ -16,20 +16,14 @@ export class UsersService {
   }
 
   async users(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
+    where?: Prisma.UserWhereInput;
   }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { orderBy, where } = params;
 
     return this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
       orderBy,
+      where,
     });
   }
 
@@ -40,10 +34,10 @@ export class UsersService {
   }
 
   async updateUser(params: {
-    where: Prisma.UserWhereUniqueInput;
     data: Prisma.UserUpdateInput;
+    where: Prisma.UserWhereUniqueInput;
   }): Promise<User> {
-    const { where, data } = params;
+    const { data, where } = params;
 
     return this.prisma.user.update({
       data,

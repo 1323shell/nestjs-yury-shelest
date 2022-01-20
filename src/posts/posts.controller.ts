@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { Post as PostModel } from '@prisma/client';
 
@@ -15,15 +16,18 @@ import { PostsService } from './posts.service';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get(':searchString')
+  @Get()
   async getFilteredPosts(
-    @Param('searchString') searchString: string,
+    @Query() query: { title?: string; content?: string },
   ): Promise<PostModel[]> {
     return this.postsService.getFilteredPosts({
       where: {
-        OR: [
+        AND: [
           {
-            title: { contains: searchString },
+            title: { contains: query.title },
+          },
+          {
+            content: { contains: query.content },
           },
         ],
       },
@@ -37,22 +41,23 @@ export class PostsController {
 
   @Post()
   async createDraft(
-    @Body() postData: { title: string; authorEmail: string },
+    @Body() postData: { authorEmail: string; content?: string; title: string },
   ): Promise<PostModel> {
-    const { title, authorEmail } = postData;
+    const { authorEmail, content, title } = postData;
 
     return this.postsService.createPost({
-      title,
       author: {
         connect: { email: authorEmail },
       },
+      content,
+      title,
     });
   }
 
   @Put(':id')
   async updatePost(
     @Param('id') id: string,
-    @Body() data: { title: string },
+    @Body() data: { content?: string; title: string },
   ): Promise<PostModel> {
     return this.postsService.updatePost({
       where: { id: Number(id) },
