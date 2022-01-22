@@ -1,16 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from '../decorators/metadata.decorator';
+import { CurrentUser } from '../decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -27,12 +21,12 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@CurrentUser() user: User) {
+    return this.authService.login(user);
   }
 
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@CurrentUser() user: User) {
+    return user;
   }
 }
