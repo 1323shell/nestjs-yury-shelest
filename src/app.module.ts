@@ -2,15 +2,15 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import helmet from 'helmet';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from './services/prisma.service';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [UsersModule, PostsModule],
+  imports: [UsersModule, AuthModule, PostsModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [PrismaService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
