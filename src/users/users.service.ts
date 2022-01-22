@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { User, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../services/prisma.service';
-import { generateHash } from '../services/password';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async getUser(
+  async findOne(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
@@ -16,7 +15,7 @@ export class UsersService {
     });
   }
 
-  async getFilteredUsers(params: {
+  async findFiltered(params: {
     orderBy?: Prisma.UserOrderByWithRelationInput;
     where?: Prisma.UserWhereInput;
   }): Promise<User[]> {
@@ -28,15 +27,13 @@ export class UsersService {
     });
   }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    data.password = await generateHash(data.password);
-
+  async create(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({
       data,
     });
   }
 
-  async updateUser(params: {
+  async update(params: {
     data: Prisma.UserUpdateInput;
     where: Prisma.UserWhereUniqueInput;
   }): Promise<User> {
@@ -48,7 +45,7 @@ export class UsersService {
     });
   }
 
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+  async remove(where: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.delete({
       where,
     });

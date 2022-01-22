@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 import { UsersService } from '../users/users.service';
-import { verifyPassword } from '../services/password';
+import { generateHash, verifyPassword } from '../services/password';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.getUser({ email });
+    const user = await this.usersService.findOne({ email });
 
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
@@ -25,6 +25,14 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  async register(data: Prisma.UserCreateInput): Promise<User> {
+    data.password = await generateHash(data.password);
+
+    const user = await this.usersService.create(data);
+
+    return user;
   }
 
   async login(user: User) {

@@ -17,10 +17,10 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async getFilteredPosts(
+  findFiltered(
     @Query() query: { title?: string; content?: string },
   ): Promise<PostModel[]> {
-    return this.postsService.getFilteredPosts({
+    return this.postsService.findFiltered({
       where: {
         AND: [
           {
@@ -35,17 +35,17 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.getPost({ id: Number(id) });
+  findOne(@Param('id') id: string): Promise<PostModel> {
+    return this.postsService.findOne({ id: parseInt(id, 10) });
   }
 
   @Post()
-  async createDraft(
-    @Body() postData: { authorEmail: string; content?: string; title: string },
+  create(
+    @Body() data: { authorEmail: string; content?: string; title: string },
   ): Promise<PostModel> {
-    const { authorEmail, content, title } = postData;
+    const { authorEmail, content, title } = data;
 
-    return this.postsService.createPost({
+    return this.postsService.create({
       author: {
         connect: { email: authorEmail },
       },
@@ -55,18 +55,18 @@ export class PostsController {
   }
 
   @Put(':id')
-  async updatePost(
+  update(
     @Param('id') id: string,
     @Body() data: { content?: string; title: string },
   ): Promise<PostModel> {
-    return this.postsService.updatePost({
-      where: { id: Number(id) },
+    return this.postsService.update({
       data,
+      where: { id: parseInt(id, 10) },
     });
   }
 
   @Delete(':id')
-  async deletePost(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.deletePost({ id: Number(id) });
+  remove(@Param('id') id: string): Promise<PostModel> {
+    return this.postsService.remove({ id: parseInt(id, 10) });
   }
 }

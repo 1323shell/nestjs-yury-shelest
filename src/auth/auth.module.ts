@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthController } from './auth.controller';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
@@ -19,6 +20,7 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
       signOptions: { expiresIn: JWT_EXPIRES_IN },
     }),
   ],
+  controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
