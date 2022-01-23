@@ -1,53 +1,64 @@
-import { Injectable } from '@nestjs/common';
-import { Post, Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Post } from '@prisma/client';
 
 import { PrismaService } from '../services/prisma.service';
+import { CreatePostDto } from './dto/create.dto';
+import { FindPostsDto } from './dto/find-filtered.dto';
+import { FindOnePostDto } from './dto/find.dto';
+import { UpdatePostDto } from './dto/update.dto';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(
-    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
-  ): Promise<Post | null> {
-    return this.prisma.post.findUnique({
-      where: postWhereUniqueInput,
+  async findOne(data: FindOnePostDto): Promise<Post> {
+    const post = await this.prisma.post.findUnique({
+      where: data,
     });
+
+    if (!post) {
+      const message = `Post with id ${data.id} is not found`;
+
+      throw new NotFoundException(message);
+    }
+
+    return post;
   }
 
-  async findFiltered(params: {
-    orderBy?: Prisma.PostOrderByWithRelationInput;
-    where?: Prisma.PostWhereInput;
-  }): Promise<Post[]> {
-    const { orderBy, where } = params;
+  findFiltered(data: FindPostsDto): Promise<Post[]> {
+    const { content, orderBy, title } = data;
 
     return this.prisma.post.findMany({
       orderBy,
-      where,
+      where: {
+        AND: [
+          {
+            title: { contains: title },
+          },
+          {
+            content: { contains: content },
+          },
+        ],
+      },
     });
   }
 
-  async create(data: Prisma.PostCreateInput): Promise<Post> {
+  create(data: CreatePostDto): Promise<Post> {
     return this.prisma.post.create({
       data,
     });
   }
 
-  async update(params: {
-    data: Prisma.PostUpdateInput;
-    where: Prisma.PostWhereUniqueInput;
-  }): Promise<Post> {
-    const { data, where } = params;
-
+  update(id: number, data: UpdatePostDto): Promise<Post> {
     return this.prisma.post.update({
       data,
-      where,
+      where: { id },
     });
   }
 
-  async remove(where: Prisma.PostWhereUniqueInput): Promise<Post> {
+  remove(id: number): Promise<Post> {
     return this.prisma.post.delete({
-      where,
+      where: { id },
     });
   }
 }

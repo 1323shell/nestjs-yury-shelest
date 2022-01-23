@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -11,43 +12,39 @@ import {
 import { User } from '@prisma/client';
 
 import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update.dto';
+import { CreateUserDto } from './dto/create.dto';
+import { FindUsersDto } from './dto/find-filtered.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  findFiltered(@Query() query: { email?: string }): Promise<User[]> {
-    return this.usersService.findFiltered({
-      where: {
-        email: { contains: query.email },
-      },
-    });
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.findOne({ id });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne({ id: parseInt(id, 10) });
+  @Get()
+  findFiltered(@Query() query: FindUsersDto): Promise<User[]> {
+    return this.usersService.findFiltered(query);
   }
 
   @Post()
-  create(@Body() data: { email: string; password: string }): Promise<User> {
+  create(@Body() data: CreateUserDto): Promise<User> {
     return this.usersService.create(data);
   }
 
   @Put(':id')
   update(
-    @Param('id') id: string,
-    @Body() data: { email?: string; password: string },
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateUserDto,
   ): Promise<User> {
-    return this.usersService.update({
-      data,
-      where: { id: parseInt(id, 10) },
-    });
+    return this.usersService.update(id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<User> {
-    return this.usersService.remove({ id: parseInt(id, 10) });
+  remove(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.usersService.remove(id);
   }
 }

@@ -1,6 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './helpers/http-exeption.filter';
 import { PrismaService } from './services/prisma.service';
 
 async function bootstrap() {
@@ -10,6 +12,11 @@ async function bootstrap() {
   prismaService.enableShutdownHooks(app);
 
   app.enableCors();
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  const httpAdapter = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   await app.listen(3000);
 }
 bootstrap();

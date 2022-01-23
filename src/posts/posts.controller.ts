@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -11,38 +12,26 @@ import {
 import { Post as PostModel } from '@prisma/client';
 
 import { PostsService } from './posts.service';
+import { CreatePostDto } from './dto/create.dto';
+import { FindPostsDto } from './dto/find-filtered.dto';
+import { UpdatePostDto } from './dto/update.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get()
-  findFiltered(
-    @Query() query: { title?: string; content?: string },
-  ): Promise<PostModel[]> {
-    return this.postsService.findFiltered({
-      where: {
-        AND: [
-          {
-            title: { contains: query.title },
-          },
-          {
-            content: { contains: query.content },
-          },
-        ],
-      },
-    });
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
+    return this.postsService.findOne({ id });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.findOne({ id: parseInt(id, 10) });
+  @Get()
+  findFiltered(@Query() query: FindPostsDto): Promise<PostModel[]> {
+    return this.postsService.findFiltered(query);
   }
 
   @Post()
-  create(
-    @Body() data: { authorEmail: string; content?: string; title: string },
-  ): Promise<PostModel> {
+  create(@Body() data: CreatePostDto): Promise<PostModel> {
     const { authorEmail, content, title } = data;
 
     return this.postsService.create({
@@ -56,17 +45,14 @@ export class PostsController {
 
   @Put(':id')
   update(
-    @Param('id') id: string,
-    @Body() data: { content?: string; title: string },
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdatePostDto,
   ): Promise<PostModel> {
-    return this.postsService.update({
-      data,
-      where: { id: parseInt(id, 10) },
-    });
+    return this.postsService.update(id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.remove({ id: parseInt(id, 10) });
+  remove(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
+    return this.postsService.remove(id);
   }
 }

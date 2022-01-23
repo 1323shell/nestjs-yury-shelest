@@ -16,7 +16,7 @@ export class AuthService {
     const user = await this.usersService.findOne({ email });
 
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+      throw new NotFoundException(`User with email ${email} is not found`);
     }
 
     if (await verifyPassword(password, user.password)) {
