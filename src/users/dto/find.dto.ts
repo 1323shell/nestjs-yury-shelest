@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsNumber } from 'class-validator';
 
 export class FindOneUserDto {
@@ -6,4 +7,7 @@ export class FindOneUserDto {
 
   @IsEmail()
   email?: string;
+
+  @Exclude()
+  password?: string;
 }

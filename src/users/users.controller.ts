@@ -11,12 +11,15 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update.dto';
 import { CreateUserDto } from './dto/create.dto';
+import { FindOneUserDto } from './dto/find.dto';
 import { FindUsersDto } from './dto/find-filtered.dto';
 
 @Controller('users')
+@Serialize(FindOneUserDto)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

@@ -34,11 +34,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp();
 
-    let status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = exception.message;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let { message } = exception;
+
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      message = (exception.getResponse() as any).message;
+    }
 
     if (PrismaErrors.some((error) => exception instanceof error)) {
       console.log(JSON.stringify(exception));
