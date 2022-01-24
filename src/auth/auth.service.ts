@@ -4,6 +4,7 @@ import { Prisma, User } from '@prisma/client';
 
 import { UsersService } from '../users/users.service';
 import { generateHash, verifyPassword } from '../services/password';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -41,5 +42,15 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async forgotPassword(data: ForgotPasswordDto): Promise<string> {
+    const user = await this.usersService.findOne(data);
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${data.email} is not found`);
+    }
+
+    return 'Refresh token was successfully sent to your email';
   }
 }

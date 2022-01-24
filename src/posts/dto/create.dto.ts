@@ -13,5 +13,6 @@ export class CreatePostDto {
   @IsEmail()
   authorEmail?: string;
 
-  author?: Prisma.UserCreateNestedOneWithoutPostsInput;
+  @IsOptional()
+  author: Prisma.UserCreateNestedOneWithoutPostsInput;
 }

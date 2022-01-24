@@ -1,4 +1,5 @@
 import {
+  IsDate,
   IsEmail,
   IsOptional,
   IsString,
@@ -9,11 +10,19 @@ import {
 export class UpdateUserDto {
   @IsEmail()
   @IsOptional()
-  email: string;
+  email?: string;
 
   @IsString()
   @IsOptional()
   @MinLength(12)
   @MaxLength(20)
-  password: string;
+  password?: string;
+
+  @IsOptional()
+  @IsString()
+  resetPasswordToken?: string;
+
+  @IsOptional()
+  @IsDate()
+  resetPasswordExpiresAt?: Date;
 }
