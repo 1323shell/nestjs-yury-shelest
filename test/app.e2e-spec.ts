@@ -31,13 +31,13 @@ describe('AppController (e2e)', () => {
       .send({ email, password: 'changeme' })
       .expect(201);
 
-    const token = loginReq.body.access_token;
+    const token = loginReq.body.accessToken;
 
     return request(app.getHttpServer())
       .get('/profile')
       .set('Authorization', 'Bearer ' + token)
       .expect(200)
-      .expect({ userId: 1, email });
+      .expect({ sub: 1, email });
   });
 
   afterEach(async () => {

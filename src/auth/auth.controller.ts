@@ -9,6 +9,7 @@ import { CurrentUser } from '../decorators/user.decorator';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { CreateUserDto } from '../users/dto/create.dto';
 import { FindOneUserDto } from '../users/dto/find.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 @Serialize(FindOneUserDto)
@@ -33,6 +34,13 @@ export class AuthController {
     return user;
   }
 
+  @Public()
+  @Post('refresh-token')
+  refreshToken(@Body() body: RefreshTokenDto) {
+    return this.authService.refreshToken(body);
+  }
+
+  @Public()
   @Post('password/forgot')
   async forgotPassword(@Body() body: ForgotPasswordDto): Promise<string> {
     return this.authService.forgotPassword(body);
