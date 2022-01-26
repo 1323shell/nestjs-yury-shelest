@@ -1,15 +1,26 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 
+import { ResetPasswordToken } from '../types';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { Public } from '../decorators/metadata.decorator';
 import { CurrentUser } from '../decorators/user.decorator';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { CreateUserDto } from '../users/dto/create.dto';
 import { FindOneUserDto } from '../users/dto/find.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @Serialize(FindOneUserDto)
@@ -32,6 +43,20 @@ export class AuthController {
   @Get('profile')
   getProfile(@CurrentUser() user: User) {
     return user;
+  }
+
+  @Put('password')
+  changePassword(@Body() body: ChangePasswordDto): Promise<User> {
+    return this.authService.changePassword(body);
+  }
+
+  @Public()
+  @Post('password/reset')
+  resetPassword(
+    @Query() query: ResetPasswordToken,
+    @Body() body: ResetPasswordDto,
+  ): Promise<User> {
+    return this.authService.resetPassword(query, body);
   }
 
   @Public()

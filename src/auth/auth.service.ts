@@ -1,15 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
+import { LoginResponse, ResetPasswordToken } from '../types';
 import { UsersService } from '../users/users.service';
 import { EmailsService } from '../emails/emails.service';
 import { generateHash, verifyPassword } from '../services/password';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { LoginResponse } from '../types';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 const BASE_URL = process.env.BASE_URL;
 const JWT_REFRESH = process.env.JWT_REFRESH;
@@ -19,12 +25,15 @@ const SALT_ROUNDS = 12;
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
     private emailsService: EmailsService,
     private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
-  private async decodeUser(token: string, secretOrPublicKey: string) {
+  private async decodeUser(
+    token: string,
+    secretOrPublicKey: string,
+  ): Promise<User> {
     const { sub } = jwt.verify(token, secretOrPublicKey) as JwtPayload;
 
     const user = await this.usersService.findOne({ id: parseInt(sub, 10) });
@@ -52,7 +61,14 @@ export class AuthService {
     });
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  private isPasswordResetTokenExpired(user: User): boolean {
+    const timeDiff =
+      new Date(user.resetPasswordExpiresAt).getTime() - Date.now();
+
+    return timeDiff < 0 || timeDiff > 864e5;
+  }
+
+  async validateUser(email: string, password: string): Promise<User | never> {
     const user = await this.usersService.findOne({ email });
 
     if (!user) {
@@ -60,8 +76,7 @@ export class AuthService {
     }
 
     if (await verifyPassword(password, user.password)) {
-      const { password: userPassword, ...result } = user;
-      return result;
+      return user;
     }
 
     return null;
@@ -75,14 +90,59 @@ export class AuthService {
     return user;
   }
 
-  login(user: User): LoginResponse {
+  async login(user: User): Promise<LoginResponse> {
     const payload = { email: user.email, sub: user.id };
+
+    await this.usersService.update(user.id, {
+      resetPasswordToken: null,
+      resetPasswordExpiresAt: null,
+    });
 
     return {
       ...user,
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.generateRefreshToken(user.id),
     };
+  }
+
+  async changePassword(data: ChangePasswordDto): Promise<User | never> {
+    const { email, newPassword, oldPassword } = data;
+    const user = await this.validateUser(email, oldPassword);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    const password = await generateHash(newPassword);
+
+    await this.usersService.update(user.id, { password });
+
+    return user;
+  }
+
+  async resetPassword(
+    query: ResetPasswordToken,
+    data: ResetPasswordDto,
+  ): Promise<User | never> {
+    const user = await this.usersService.findOne(query);
+
+    if (!user) {
+      throw new UnauthorizedException('Password reset token does not exist');
+    }
+
+    if (this.isPasswordResetTokenExpired(user)) {
+      throw new UnauthorizedException('Password reset token has expired');
+    }
+
+    const password = await generateHash(data.password);
+
+    await this.usersService.update(user.id, {
+      password,
+      resetPasswordExpiresAt: null,
+      resetPasswordToken: null,
+    });
+
+    return user;
   }
 
   async refreshToken({
@@ -108,7 +168,7 @@ export class AuthService {
       subject: 'Forgot Password',
       html: `<div>
         <p>Your refresh token: </p>
-        <a href="${`${BASE_URL}?token=${resetPasswordToken}`}">Refresh password</a>
+        <a href="${`${BASE_URL}/auth/password/reset?resetPasswordToken=${resetPasswordToken}`}">Refresh password</a>
       </div>`,
     });
 

@@ -3,6 +3,10 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+export interface ResetPasswordToken {
+  resetPasswordToken: string;
+}
+
 export interface sendEmail {
   from: string;
   to: string;
