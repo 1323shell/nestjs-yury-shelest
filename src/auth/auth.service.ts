@@ -11,6 +11,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { LoginResponse, ResetPasswordToken } from '../types';
 import { UsersService } from '../users/users.service';
 import { EmailsService } from '../emails/emails.service';
+import { PrismaService } from '../db/prisma.service';
 import { generateHash, verifyPassword } from '../services/password';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -27,6 +28,7 @@ export class AuthService {
   constructor(
     private emailsService: EmailsService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
     private usersService: UsersService,
   ) {}
 
@@ -47,9 +49,9 @@ export class AuthService {
     const resetPasswordExpiresAt = new Date();
     resetPasswordExpiresAt.setDate(resetPasswordExpiresAt.getDate() + 1);
 
-    await this.usersService.update(user.id, {
-      resetPasswordExpiresAt,
-      resetPasswordToken,
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetPasswordExpiresAt, resetPasswordToken },
     });
 
     return resetPasswordToken;
@@ -93,9 +95,9 @@ export class AuthService {
   async login(user: User): Promise<LoginResponse> {
     const payload = { email: user.email, sub: user.id };
 
-    await this.usersService.update(user.id, {
-      resetPasswordToken: null,
-      resetPasswordExpiresAt: null,
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetPasswordExpiresAt: null, resetPasswordToken: null },
     });
 
     return {
@@ -115,7 +117,10 @@ export class AuthService {
 
     const password = await generateHash(newPassword);
 
-    await this.usersService.update(user.id, { password });
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password },
+    });
 
     return user;
   }
@@ -136,10 +141,13 @@ export class AuthService {
 
     const password = await generateHash(data.password);
 
-    await this.usersService.update(user.id, {
-      password,
-      resetPasswordExpiresAt: null,
-      resetPasswordToken: null,
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password,
+        resetPasswordExpiresAt: null,
+        resetPasswordToken: null,
+      },
     });
 
     return user;

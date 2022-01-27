@@ -3,7 +3,7 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './helpers/http-exeption.filter';
-import { PrismaService } from './services/prisma.service';
+import { PrismaService } from './db/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

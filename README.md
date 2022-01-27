@@ -6,6 +6,8 @@
 
 ```bash
 $ npm install
+$ npm run prisma:generate
+$ npm run prisma:migrate
 ```
 
 ## Running the app
@@ -33,12 +35,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-## Important
-
-```bash
-# You must to run this command after every change to your Prisma models to update your generated Prisma Client.
-# It reads your Prisma schema and updates the generated Prisma Client library inside node_modules/@prisma/client.
-$ npx prisma generate
-then
-$ npx prisma migrate dev
