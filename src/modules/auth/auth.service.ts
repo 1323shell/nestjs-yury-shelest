@@ -8,11 +8,11 @@ import { Prisma, User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-import { LoginResponse, ResetPasswordToken } from '../types';
+import { LoginResponse, ResetPasswordToken } from 'src/types';
 import { UsersService } from '../users/users.service';
 import { EmailsService } from '../emails/emails.service';
-import { PrismaService } from '../db/prisma.service';
-import { generateHash, verifyPassword } from '../services/password';
+import { PrismaService } from 'src/db/prisma.service';
+import { generateHash, verifyPassword } from 'src/helpers/password';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';

@@ -9,12 +9,12 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 
-import { ResetPasswordToken } from '../types';
+import { ResetPasswordToken } from 'src/types';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { Serialize } from '../interceptors/serialize.interceptor';
-import { Public } from '../decorators/metadata.decorator';
-import { CurrentUser } from '../decorators/user.decorator';
+import { Serialize } from 'src/interceptors/serialize.interceptor';
+import { Public } from 'src/decorators/metadata.decorator';
+import { CurrentUser } from 'src/decorators/user.decorator';
 import { CreateUserDto } from '../users/dto/create.dto';
 import { FindOneUserDto } from '../users/dto/find.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';

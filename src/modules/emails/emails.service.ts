@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import nodemailer, { TestAccount } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
-import { sendEmail } from '../types';
+import { sendEmail } from 'src/types';
 
 @Injectable()
 export class EmailsService {
