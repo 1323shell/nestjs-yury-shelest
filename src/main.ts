@@ -2,11 +2,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './helpers/http-exeption.filter';
 import { PrismaService } from './db/prisma.service';
+import { AllExceptionsFilter } from './helpers/http-exeption.filter';
+import { Swagger } from './helpers/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const swagger = new Swagger(app);
+  swagger.init();
 
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.enableShutdownHooks(app);
