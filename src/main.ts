@@ -17,6 +17,8 @@ async function bootstrap() {
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
-  await app.listen(3000);
+  await app.listen(3000, () =>
+    console.log('🚀 Server ready at: http://localhost:3000/graphql'),
+  );
 }
 bootstrap();
