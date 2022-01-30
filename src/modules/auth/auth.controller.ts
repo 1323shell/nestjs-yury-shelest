@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 
-import { ResetPasswordToken } from 'src/types';
+import { LoginResponse, ResetPasswordToken } from 'src/types';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
@@ -36,12 +36,12 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@CurrentUser() user: User) {
+  async login(@CurrentUser() user: User): Promise<LoginResponse> {
     return this.authService.login(user);
   }
 
   @Get('profile')
-  getProfile(@CurrentUser() user: User) {
+  getProfile(@CurrentUser() user: User): User {
     return user;
   }
 
@@ -61,7 +61,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh-token')
-  refreshToken(@Body() body: RefreshTokenDto) {
+  refreshToken(@Body() body: RefreshTokenDto): Promise<LoginResponse> {
     return this.authService.refreshToken(body);
   }
 

@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { AuthService } from '../auth.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -15,7 +16,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(req: Request, email: string, password: string): Promise<any> {
+  async validate(
+    req: Request,
+    email: string,
+    password: string,
+  ): Promise<User | never> {
     // Request-scoped strategies
     // https://docs.nestjs.com/security/authentication#request-scoped-strategies
     const contextId = ContextIdFactory.getByRequest(req);

@@ -6,22 +6,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { Prisma } from '@prisma/client';
 
-const PrismaErrors = [
-  Prisma.PrismaClientInitializationError,
-  Prisma.PrismaClientKnownRequestError,
-  Prisma.PrismaClientRustPanicError,
-  Prisma.PrismaClientValidationError,
-  Prisma.PrismaClientUnknownRequestError,
-];
-
-interface PrismaError extends HttpException {
-  code?: string;
-  meta?: {
-    cause: string;
-  };
-}
+import { ErrorResponseBody, PrismaError, PrismaErrors } from '../types/errors';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -49,11 +35,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       if (exception.meta?.cause) {
         message = exception.meta.cause;
       } else {
+        // at this point of time there's no good way to handle all types of Prisma errors
         message = `Error code: ${exception.code}. Read more about this error here: https://www.prisma.io/docs/reference/api-reference/error-reference`;
       }
     }
 
-    const responseBody = {
+    const responseBody: ErrorResponseBody = {
       status,
       timestamp: new Date().toISOString(),
       path: httpAdapter.getRequestUrl(ctx.getRequest()),

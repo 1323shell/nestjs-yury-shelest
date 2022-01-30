@@ -4,13 +4,11 @@ import {
   NestInterceptor,
   UseInterceptors,
 } from '@nestjs/common';
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
 
 interface ClassConstructor {
-  // Need to think about this type description
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  new (...args: any[]): {};
+  new (...args: any[]): Record<string, any>;
 }
 
 export const Serialize = (dto: ClassConstructor) => {
@@ -18,10 +16,10 @@ export const Serialize = (dto: ClassConstructor) => {
 };
 
 export class SerializeInterceptor implements NestInterceptor {
-  constructor(private dto: any) {}
+  constructor(private dto: ClassConstructor) {}
 
   // include only fields with the @Expose() decorator
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler) {
     return next
       .handle()
       .pipe(map((data: any) => plainToInstance(this.dto, data)));

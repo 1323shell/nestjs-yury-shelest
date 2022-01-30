@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import nodemailer, { TestAccount } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
-import { sendEmail } from 'src/types';
+import { SendEmail } from 'src/types';
 
 @Injectable()
 export class EmailsService {
@@ -24,7 +24,7 @@ export class EmailsService {
     });
   }
 
-  async sendMail(data: sendEmail): Promise<string | false> {
+  async sendMail(data: SendEmail): Promise<string | false> {
     const info = await this.transporter.sendMail(data);
 
     // You can see the email only through an Ethereal account by following this link from response

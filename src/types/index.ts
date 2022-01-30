@@ -7,7 +7,7 @@ export interface ResetPasswordToken {
   resetPasswordToken: string;
 }
 
-export interface sendEmail {
+export interface SendEmail {
   from: string;
   to: string;
   subject: string;

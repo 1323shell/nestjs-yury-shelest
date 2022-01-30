@@ -33,10 +33,10 @@ export class PostsService {
       where: {
         AND: [
           {
-            title: { contains: title },
+            title: { contains: title, mode: 'insensitive' },
           },
           {
-            content: { contains: content },
+            content: { contains: content, mode: 'insensitive' },
           },
         ],
       },
