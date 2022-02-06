@@ -50,6 +50,7 @@ Instead, try to use @ApiProperty() in DTO to avoid this issue
 ## Docker
 
 ```bash
+# create .env file from .env.example and set DB_HOST=postgres
 # building new NestJS docker image
 docker-compose build
 # start docker-compose
