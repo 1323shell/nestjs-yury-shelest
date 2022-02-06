@@ -36,9 +36,9 @@ export class AuthService {
     token: string,
     secretOrPublicKey: string,
   ): Promise<User> {
-    const { sub } = jwt.verify(token, secretOrPublicKey) as JwtPayload;
+    const { id } = jwt.verify(token, secretOrPublicKey) as JwtPayload;
 
-    const user = await this.usersService.findOne({ id: parseInt(sub, 10) });
+    const user = await this.usersService.findOne({ id: parseInt(id, 10) });
 
     return user;
   }
@@ -58,7 +58,7 @@ export class AuthService {
   }
 
   private generateRefreshToken(id: number): string {
-    return jwt.sign({ sub: id }, JWT_REFRESH, {
+    return jwt.sign({ id }, JWT_REFRESH, {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
     });
   }
@@ -93,7 +93,7 @@ export class AuthService {
   }
 
   async login(user: User): Promise<LoginResponse> {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, id: user.id };
 
     await this.prisma.user.update({
       where: { id: user.id },

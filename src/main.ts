@@ -6,6 +6,8 @@ import { PrismaService } from './db/prisma.service';
 import { AllExceptionsFilter } from './helpers/http-exeption.filter';
 import { Swagger } from './helpers/swagger';
 
+const { APP_PORT } = process.env;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -21,6 +23,6 @@ async function bootstrap() {
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
-  await app.listen(3000);
+  await app.listen(APP_PORT || 3000);
 }
 bootstrap();

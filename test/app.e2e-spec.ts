@@ -37,7 +37,7 @@ describe('AppController (e2e)', () => {
       .get('/profile')
       .set('Authorization', 'Bearer ' + token)
       .expect(200)
-      .expect({ sub: 1, email });
+      .expect({ id: 1, email });
   });
 
   afterEach(async () => {

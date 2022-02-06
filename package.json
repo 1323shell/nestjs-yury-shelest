@@ -1,8 +1,8 @@
 {
   "name": "nestjs-yury-shelest",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "NestJS Prisma starter",
+  "author": "Yury Shelest",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -19,9 +19,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "postinstall": "npm run prisma:generate",
     "prisma:generate": "npx prisma generate",
-    "migrate": "npx prisma migrate dev --name init",
-    "add-migration": "npx prisma migrate dev"
+    "migrate": "npx prisma migrate dev",
+    "start:migrate:prod": "prisma migrate dev && npm run start:prod"
   },
   "prisma": {
     "schema": "src/db/schema.prisma"
@@ -33,7 +34,6 @@
     "@nestjs/passport": "^8.1.0",
     "@nestjs/platform-express": "^8.2.6",
     "@prisma/client": "^3.8.1",
-    "@types/nodemailer": "^6.4.4",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
@@ -52,9 +52,12 @@
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/swagger": "^5.2.0",
     "@nestjs/testing": "^8.2.6",
+    "@types/bcrypt": "^5.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^16.11.21",
+    "@types/nodemailer": "^6.4.4",
     "@types/passport-jwt": "^3.0.6",
     "@types/passport-local": "^1.0.34",
     "@types/supertest": "^2.0.11",

@@ -6,8 +6,8 @@
 
 ```bash
 npm install
-npm run prisma:generate
 npm run migrate
+npm run prisma:generate
 ```
 
 ## Running the app
@@ -45,4 +45,15 @@ open your browser and navigate to http://localhost:3000/api
 @ApiBody() decorator may not work correctly for some endpoints
 because of some validation decorators in DTO.
 Instead, try to use @ApiProperty() in DTO to avoid this issue
+```
+
+## Docker
+
+```bash
+# building new NestJS docker image
+docker-compose build
+# start docker-compose
+docker-compose up -d
+# then you can set IS_MIGRATED = true in .env file to disable
+# migrations the next time the application is launched.
 ```
