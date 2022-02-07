@@ -5,6 +5,7 @@
 ## Installation
 
 ```bash
+# create .env file from .env.example and then:
 npm install
 npm run migrate
 npm run prisma:generate
