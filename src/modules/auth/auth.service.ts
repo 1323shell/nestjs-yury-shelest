@@ -77,11 +77,13 @@ export class AuthService {
       throw new NotFoundException(`User with email ${email} is not found`);
     }
 
-    if (await verifyPassword(password, user.password)) {
-      return user;
+    const isPasswordVerified = await verifyPassword(password, user.password);
+
+    if (!isPasswordVerified) {
+      throw new UnauthorizedException('Invalid password');
     }
 
-    return null;
+    return user;
   }
 
   async register(data: Prisma.UserCreateInput): Promise<User> {
@@ -109,12 +111,8 @@ export class AuthService {
 
   async changePassword(data: ChangePasswordDto): Promise<User | never> {
     const { email, newPassword, oldPassword } = data;
+
     const user = await this.validateUser(email, oldPassword);
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid password');
-    }
-
     const password = await generateHash(newPassword);
 
     await this.prisma.user.update({
